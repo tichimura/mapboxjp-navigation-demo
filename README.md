@@ -1,5 +1,4 @@
-# Navigation Demo
-
+# Mapbox Navigation Demo
 
 ## はじめに
 
@@ -41,7 +40,7 @@ mapbox-android-navigation-ui: 0.42.4
 
 [Navigation Map Route](https://docs.mapbox.com/android/navigation/examples/navigation-map-route)
 
-上記サンプルの修正版は`step0`ブランチのREADME_step0.mdを参照
+上記サンプルの修正版は`step0`ブランチのREADME.mdを参照
 
 ## セットアップ
 

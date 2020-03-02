@@ -110,7 +110,7 @@ mapbox-android-navigation-ui: 0.42.4
 
 ```
 
-なお、FloatingActionButtonのパッケージも以下のように変更しているので注意
+なお、FloatingActionButtonのパッケージも以下のように変更しているので注意(Step.0ブランチとは違い、1箇所のみ)
 
 ```
        <android.support.design.widget.FloatingActionButton

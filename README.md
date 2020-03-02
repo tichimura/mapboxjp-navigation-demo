@@ -62,7 +62,6 @@ mapbox-android-navigation-ui: 0.42.4
 
         Mapbox.getInstance(this, apiKey);
 
-
 ```
 
 res/values/strings.xmlに設定するのであれば、以下のように設定し、
@@ -350,6 +349,9 @@ Navigation SDK用の設定、また、PermissionManagerの設定を追加
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+<!--        環境変数としてトークン設定時　-->
+        <meta-data android:name="MAPBOX_ACCESS_TOKEN" android:value="${MAPBOX_ACCESS_TOKEN}" />
+        
     </application>
 
 

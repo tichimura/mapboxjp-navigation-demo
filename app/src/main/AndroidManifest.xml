@@ -17,6 +17,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+
         android:theme="@style/AppTheme">
 <!--        <activity android:name=".MainActivity">-->
         <activity android:name=".navigationui.NavigationMapRouteActivity">
@@ -26,6 +27,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+<!--        環境変数としてトークン設定時　-->
+        <meta-data android:name="MAPBOX_ACCESS_TOKEN" android:value="${MAPBOX_ACCESS_TOKEN}" />
     </application>
 
 

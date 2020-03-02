@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">My Navigation</string>
-    <string name="access_token">pk.eyJ1IjoidGljaGltdXJhIiwiYSI6ImNrMnBpN3NxMzA0bGMzbnBpdmhqd2EyazQifQ.5ozS730sMWdKGe5gx32BJA</string>
     <string name="style_uri">mapbox://styles/tichimura/ck75kij6e2v4x1ip3a2v2eokf/draft</string>
     <string name="user_location_permission_explanation">This app needs location permissions in order to show its functionality.</string>
     <string name="user_location_permission_not_granted">You didn\'t grant location permissions.</string>

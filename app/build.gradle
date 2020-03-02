@@ -17,6 +17,8 @@ android {
         versionName "1.0"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders = [MAPBOX_ACCESS_TOKEN: System.getenv("MAPBOX_ACCESS_TOKEN")] // mapbox tokenの追加
+
     }
     buildTypes {
         release {

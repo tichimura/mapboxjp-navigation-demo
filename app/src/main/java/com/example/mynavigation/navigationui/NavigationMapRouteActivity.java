@@ -3,6 +3,8 @@ package com.example.mynavigation.navigationui;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
@@ -34,7 +36,6 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.example.mynavigation.R;
 import com.mapbox.services.android.navigation.ui.v5.route.NavigationMapRoute;
-//import com.mapbox.services.android.navigation.v5.navigation.MapboxNavigation;
 import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute;
 
 import java.util.List;
@@ -62,36 +63,39 @@ public class NavigationMapRouteActivity extends AppCompatActivity implements OnM
     private PermissionsManager permissionsManager;
     private MapboxMap mapboxMap;
     private NavigationMapRoute navigationMapRoute;
-//    private StyleCycle styleCycle = new StyleCycle();
-
 
     private Marker originMarker;
     private Marker destinationMarker;
+
+    private ApplicationInfo appInfo = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Mapbox.getInstance(this, getString(R.string.access_token));
+        // 環境変数から、TOKENを取得
+        try {
+            appInfo = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        String apiKey = appInfo.metaData.getString("MAPBOX_ACCESS_TOKEN");
+
+        Mapbox.getInstance(this, apiKey);
+
+        // もしくは、res/values/strings.xmlに記載
+        // Mapbox.getInstance(this, getString(R.string.access_token));
 
         setContentView(R.layout.activity_navigation_map_route);
         ButterKnife.bind(this);
-//        mapView = findViewById(R.id.mapView);
 
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
 
-//        MapboxNavigation navigation = new MapboxNavigation(this, getString(R.string.access_token));
-
 
     }
-
-//    @OnClick(R.id.fabStyles)
-//    public void onStyleFabClick() {
-//        if (mapboxMap != null) {
-//            mapboxMap.setStyle(styleCycle.getNextStyle());
-//        }
-//    }
 
     @OnClick(R.id.fabRemoveRoute)
     public void onRemoveRouteClick(View fabRemoveRoute) {
@@ -103,9 +107,7 @@ public class NavigationMapRouteActivity extends AppCompatActivity implements OnM
     public void onMapReady(MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
 
-//      getString(R.string.access_token)
-//        mapboxMap.setStyle(styleCycle.getStyle(), style -> {　// onStyleFabClick()もコメントにしている
-//        mapboxMap.setStyle(new Style.Builder().fromUri("mapbox://styles/tichimura/ck75kij6e2v4x1ip3a2v2eokf/draft"), style -> {
+
         mapboxMap.setStyle(new Style.Builder().fromUri(getString(R.string.style_uri)), style -> {
             initializeLocationComponent(mapboxMap);
             navigationMapRoute = new NavigationMapRoute(null, mapView, mapboxMap);
@@ -281,28 +283,5 @@ public class NavigationMapRouteActivity extends AppCompatActivity implements OnM
                 .getRoute(this);
     }
 
-//    private static class StyleCycle {
-//        private static final String[] STYLES = new String[] {
-//                Style.MAPBOX_STREETS,
-//                Style.OUTDOORS,
-//                Style.LIGHT,
-//                Style.DARK,
-//                Style.SATELLITE_STREETS
-//        };
-//
-//
-//        private int index;
-//
-//        private String getNextStyle() {
-//            index++;
-//            if (index == STYLES.length) {
-//                index = 0;
-//            }
-//            return getStyle();
-//        }
-//
-//        private String getStyle() {
-//            return STYLES[index];
-//        }
-//    }
+
 }

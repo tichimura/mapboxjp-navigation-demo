@@ -44,8 +44,13 @@ mapbox-android-navigation-ui: 0.42.4
 
 ## セットアップ
 
-### 1. `layout/activity_navigation_map_route.xml`での変更
+### 0. 事前準備
 
+- 環境変数の設定
+
+`MAPBOX_ACCESS_TOKEN`を環境変数として渡し、`build.gradle`と`AndroidManifest.xml`への編集を行なっている
+
+### 1. `layout/activity_navigation_map_route.xml`での変更
 
 - androidxを利用するように変更
 
@@ -140,7 +145,6 @@ app:backgroundTint="@color/colorRed"
 - `access_token`に、自身のToken、`style_uri`に、style uriを指定する
 
 ```
-    <string name="access_token">YOUR_ACCESS_TOKEN</string>
     <string name="style_uri">mapbox://YOUR_STYLE</string>    
 ```
 
@@ -212,6 +216,7 @@ android {
         versionName "1.0"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders = [MAPBOX_ACCESS_TOKEN: System.getenv("MAPBOX_ACCESS_TOKEN")] // mapbox tokenの追加        
     }
     buildTypes {
         release {

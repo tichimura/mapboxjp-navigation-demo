@@ -49,6 +49,36 @@ mapbox-android-navigation-ui: 0.42.4
 - 環境変数の設定
 
 `MAPBOX_ACCESS_TOKEN`を環境変数として渡し、`build.gradle`と`AndroidManifest.xml`への編集を行なっている
+その後、メインコードにて、以下のように呼び出している
+```
+        // 環境変数から、TOKENを取得
+        try {
+            appInfo = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        String apiKey = appInfo.metaData.getString("MAPBOX_ACCESS_TOKEN");
+
+        Mapbox.getInstance(this, apiKey);
+
+
+```
+
+res/values/strings.xmlに設定するのであれば、以下のように設定し、
+
+```
+<string name="access_token"></string>
+
+```
+
+メインコードのonCreate()メソッドにて以下を呼び出す
+
+```
+        Mapbox.getInstance(this, getString(R.string.access_token));
+```
+
+
 
 ### 1. `layout/activity_navigation_map_route.xml`での変更
 
@@ -332,8 +362,11 @@ Navigation SDK用の設定、また、PermissionManagerの設定を追加
 ```
 package com.example.mynavigation.navigationui;
 
+
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
@@ -396,11 +429,26 @@ public class NavigationMapRouteActivity extends AppCompatActivity implements OnM
     private Marker originMarker;
     private Marker destinationMarker;
 
+    private ApplicationInfo appInfo = null;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Mapbox.getInstance(this, getString(R.string.access_token));
+        // 環境変数から、TOKENを取得
+        try {
+            appInfo = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        String apiKey = appInfo.metaData.getString("MAPBOX_ACCESS_TOKEN");
+
+        Mapbox.getInstance(this, apiKey);
+
+        // もしくは、res/values/strings.xmlに記載
+        // Mapbox.getInstance(this, getString(R.string.access_token));
 
         setContentView(R.layout.activity_navigation_map_route);
         ButterKnife.bind(this);
@@ -421,7 +469,7 @@ public class NavigationMapRouteActivity extends AppCompatActivity implements OnM
     public void onMapReady(MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
 
-        // fromUriは、自身で設定
+
         mapboxMap.setStyle(new Style.Builder().fromUri(getString(R.string.style_uri)), style -> {
             initializeLocationComponent(mapboxMap);
             navigationMapRoute = new NavigationMapRoute(null, mapView, mapboxMap);
@@ -501,9 +549,10 @@ public class NavigationMapRouteActivity extends AppCompatActivity implements OnM
         mapView.onSaveInstanceState(outState);
     }
 
-    // 編集
     @SuppressWarnings("MissingPermission")
     private void initializeLocationComponent(MapboxMap mapboxMap) {
+
+        // PermissionManagerの追加
 
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
 
@@ -519,6 +568,8 @@ public class NavigationMapRouteActivity extends AppCompatActivity implements OnM
         }
     }
 
+
+    // PermissionManagerの設定
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -593,6 +644,7 @@ public class NavigationMapRouteActivity extends AppCompatActivity implements OnM
                 .build()
                 .getRoute(this);
     }
+
 
 }
 

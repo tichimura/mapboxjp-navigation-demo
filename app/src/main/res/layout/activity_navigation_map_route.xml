@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--<android.support.design.widget.CoordinatorLayout-->
 
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -53,14 +52,6 @@
 <!--        app:mapbox_cameraTargetLng="139.692946"-->
 <!--        app:mapbox_cameraZoom="16"/>-->
 
-
-    <!--    <ProgressBar-->
-<!--        android:id="@+id/routeLoadingProgressBar"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_gravity="center"-->
-<!--        android:visibility="invisible"/>-->
-
     <ProgressBar
         android:id="@+id/routeLoadingProgressBar"
         android:layout_width="wrap_content"
@@ -71,22 +62,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:visibility="invisible"/>
 
-<!--    <FrameLayout-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_gravity="top|center"-->
-<!--        android:clipToPadding="false"-->
-<!--        android:paddingBottom="16dp"-->
-<!--        app:layout_anchor="@id/fabStyles"-->
-<!--        app:layout_anchorGravity="top|center">-->
 
-<!--    <FrameLayout-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintBottom_toTopOf="@id/fabStyles"-->
-<!--        app:layout_constraintEnd_toEndOf="@id/fabStyles"-->
-<!--        android:clipToPadding="false"-->
-<!--        android:layout_marginBottom="16dp">-->
 
     <FrameLayout
         android:layout_width="wrap_content"
@@ -94,7 +70,6 @@
         android:clipToPadding="false"
         android:layout_marginBottom="16dp">
 
-<!--        <android.support.design.widget.FloatingActionButton-->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
 
             android:id="@+id/fabRemoveRoute"
@@ -108,5 +83,4 @@
     </FrameLayout>
 
 
-<!--</android.support.design.widget.CoordinatorLayout>-->
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

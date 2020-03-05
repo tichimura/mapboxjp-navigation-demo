@@ -11,6 +11,8 @@
     <!--    <uses-feature android:name="android.hardware.location.gps"/>-->
 
 
+<!--    android:name=".navigationui.NavigationMapRouteActivity"-->
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -23,8 +25,8 @@
         <activity android:name=".navigationui.NavigationMapRouteActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.VIEW"/>
             </intent-filter>
         </activity>
 <!--        環境変数としてトークン設定時　-->

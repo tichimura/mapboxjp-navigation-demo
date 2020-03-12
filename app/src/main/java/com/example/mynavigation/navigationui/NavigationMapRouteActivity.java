@@ -1,6 +1,5 @@
 package com.example.mynavigation.navigationui;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -8,8 +7,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -22,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.mynavigation.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.gson.JsonObject;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineCallback;
 import com.mapbox.android.core.location.LocationEngineProvider;
@@ -33,23 +29,16 @@ import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.api.directions.v5.DirectionsCriteria;
 import com.mapbox.api.directions.v5.models.DirectionsResponse;
 import com.mapbox.api.directions.v5.models.DirectionsRoute;
-import com.mapbox.core.constants.Constants;
 import com.mapbox.core.utils.TextUtils;
 import com.mapbox.geojson.Feature;
-import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Geometry;
-import com.mapbox.geojson.LineString;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.camera.CameraUpdate;
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.exceptions.InvalidLatLngBoundsException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.modes.CameraMode;
 import com.mapbox.mapboxsdk.location.modes.RenderMode;
@@ -62,13 +51,9 @@ import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.services.android.navigation.ui.v5.NavigationLauncher;
 import com.mapbox.services.android.navigation.ui.v5.NavigationLauncherOptions;
-import com.mapbox.services.android.navigation.ui.v5.camera.CameraUpdateMode;
-import com.mapbox.services.android.navigation.ui.v5.camera.NavigationCameraUpdate;
-import com.mapbox.services.android.navigation.ui.v5.map.NavigationMapboxMap;
 import com.mapbox.services.android.navigation.ui.v5.route.NavigationMapRoute;
 import com.mapbox.services.android.navigation.ui.v5.route.OnRouteSelectionChangeListener;
 import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute;
-import com.mapbox.services.android.navigation.v5.utils.LocaleUtils;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -78,7 +63,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -95,14 +79,12 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
 
 /*
 This code is forked and modified from Android Sample in mapbox-navigation-android
-        https://github.com/mapbox/mapbox-navigation-android/blob/v0.43.0-alpha.1/app/src/main/java/com/mapbox/services/android/navigation/testapp/activity/navigationui/NavigationLauncherActivity.java#L308
+https://github.com/mapbox/mapbox-navigation-android/blob/v0.43.0-alpha.1/app/src/main/java/com/mapbox/services/android/navigation/testapp/activity/navigationui/NavigationLauncherActivity.java#L308
 latest SDK is 1.0.0, but use 0.42.4 for some compatibility
 */
 
 public class NavigationMapRouteActivity extends AppCompatActivity implements OnMapReadyCallback, PermissionsListener, OnRouteSelectionChangeListener,
         Callback<DirectionsResponse>  {
-//public class NavigationMapRouteActivity extends AppCompatActivity implements OnMapReadyCallback, PermissionsListener, OnRouteSelectionChangeListener,
-//        MapboxMap.OnMapLongClickListener, Callback<DirectionsResponse>  {
 
     private static final int ONE_HUNDRED_MILLISECONDS = 100;
     private static final int CHANGE_SETTING_REQUEST_CODE = 1;
@@ -111,7 +93,6 @@ public class NavigationMapRouteActivity extends AppCompatActivity implements OnM
     private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 1000;
     private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 500;
     private static final int INITIAL_ZOOM = 16;
-
 
     private final List<Point> wayPoints = new ArrayList<>();
     private LocationEngine locationEngine;
@@ -136,7 +117,6 @@ public class NavigationMapRouteActivity extends AppCompatActivity implements OnM
     private PermissionsManager permissionsManager;
     private MapboxMap mapboxMap;
     private NavigationMapRoute navigationMapRoute;
-    private NavigationMapboxMap navigationMapbox;
 
     private Marker originMarker;
     private Marker destinationMarker;
@@ -146,12 +126,10 @@ public class NavigationMapRouteActivity extends AppCompatActivity implements OnM
     private static final String TAG = "MainActivity";
     private Point currentLocation;
 
-    private final LocaleUtils localeUtils = new LocaleUtils();
     private List<DirectionsRoute> routes = new ArrayList<>();
 
     private DirectionsRoute route;
-    private boolean locationFound;
-    private final NavigationMapRouteLocationCallback callback = new NavigationMapRouteLocationCallback(this);;
+    private final NavigationMapRouteLocationCallback callback = new NavigationMapRouteLocationCallback(this);
 
 
     @Override
@@ -335,14 +313,7 @@ public class NavigationMapRouteActivity extends AppCompatActivity implements OnM
                 .getRoute(this);
 
         launchRouteBtn.setEnabled(true);
-//        loading.setVisibility(View.VISIBLE);
 
-    }
-
-    private JsonObject featureProperties(String key, String value) {
-        JsonObject object = new JsonObject();
-        object.addProperty(key,value);
-        return object;
     }
 
 // END: implementation for mynavigation
@@ -398,39 +369,36 @@ public class NavigationMapRouteActivity extends AppCompatActivity implements OnM
                             .withFilter(visible);
                     style.addLayer(layer);
 
-                    mapView.addOnDidBecomeIdleListener(new MapView.OnDidBecomeIdleListener() {
 
-                        @Override
-                        public void onDidBecomeIdle() {
+                    // new MapView.OnDidBecomeIdleListener()  をLambdaに変更
 
-                            List<Feature> start_features = source.querySourceFeatures(eq(get("start"), literal("true")));
-                            Toast.makeText(NavigationMapRouteActivity.this, String.format("Found %s start point features",
-                                    start_features.size()), Toast.LENGTH_LONG).show();
+                    mapView.addOnDidBecomeIdleListener(() -> {
 
-                            Geometry start_geometry = start_features.get(0).geometry();
-                            Point start_point = (Point) start_geometry;
-                            LatLng start_latLng = new LatLng(start_point.latitude(),start_point.longitude());
+                        List<Feature> start_features = source.querySourceFeatures(eq(get("start"), literal("true")));
+                        Toast.makeText(NavigationMapRouteActivity.this, String.format("Found %s start point features",
+                                start_features.size()), Toast.LENGTH_LONG).show();
 
-                            Log.d(TAG, String.format("Feature name is %s", start_features.get(0).getProperty("name")));
+                        Geometry start_geometry = start_features.get(0).geometry();
+                        Point start_point = (Point) start_geometry;
+                        LatLng start_latLng = new LatLng(start_point.latitude(),start_point.longitude());
 
-                            originMarker = mapboxMap.addMarker(new MarkerOptions().position(start_latLng).icon(IconFactory.getInstance(NavigationMapRouteActivity.this).fromResource(R.drawable.blue_marker)));
+                        Log.d(TAG, String.format("Feature name is %s", start_features.get(0).getProperty("name")));
 
-                            List<Feature> finish_features = source.querySourceFeatures(eq(get("finish"), literal("true")));
-                            Toast.makeText(NavigationMapRouteActivity.this, String.format("Found %s finish point features",
-                                    finish_features.size()), Toast.LENGTH_SHORT).show();
+                        originMarker = mapboxMap.addMarker(new MarkerOptions().position(start_latLng).icon(IconFactory.getInstance(NavigationMapRouteActivity.this).fromResource(R.drawable.blue_marker)));
 
-                            Geometry finish_geometry = finish_features.get(0).geometry();
-                            Point finish_point = (Point) finish_geometry;
-                            LatLng finish_latLng = new LatLng(finish_point.latitude(),finish_point.longitude());
+                        List<Feature> finish_features = source.querySourceFeatures(eq(get("finish"), literal("true")));
+                        Toast.makeText(NavigationMapRouteActivity.this, String.format("Found %s finish point features",
+                                finish_features.size()), Toast.LENGTH_SHORT).show();
 
-                            Log.d(TAG, String.format("Feature name is %s", finish_features.get(0).getProperty("name")));
+                        Geometry finish_geometry = finish_features.get(0).geometry();
+                        Point finish_point = (Point) finish_geometry;
+                        LatLng finish_latLng = new LatLng(finish_point.latitude(),finish_point.longitude());
 
-                            destinationMarker = mapboxMap.addMarker(new MarkerOptions().position(finish_latLng).icon(IconFactory.getInstance(NavigationMapRouteActivity.this).fromResource(R.drawable.yellow_marker)));
+                        Log.d(TAG, String.format("Feature name is %s", finish_features.get(0).getProperty("name")));
 
-                            findRoute(start_point, finish_point);
+                        destinationMarker = mapboxMap.addMarker(new MarkerOptions().position(finish_latLng).icon(IconFactory.getInstance(NavigationMapRouteActivity.this).fromResource(R.drawable.yellow_marker)));
 
-
-                        }
+                        findRoute(start_point, finish_point);
 
 
                     });
@@ -497,9 +465,6 @@ public class NavigationMapRouteActivity extends AppCompatActivity implements OnM
         if (route != null) {
             Log.d(TAG, "Route is fixing...");
             Log.d(TAG, String.format("Route is now fixing....%s", route));
-//            Timber.d("......");
-//            Timber.d(String.format("Route is now fixing....%s", route));
-//            Timber.d("......");
         }
 
         if (route == null) {
@@ -564,7 +529,6 @@ public class NavigationMapRouteActivity extends AppCompatActivity implements OnM
                     return;
                 }
                 activity.updateCurrentLocation(Point.fromLngLat(location.getLongitude(), location.getLatitude()));
-//                activity.onLocationFound(location);
             }
         }
 

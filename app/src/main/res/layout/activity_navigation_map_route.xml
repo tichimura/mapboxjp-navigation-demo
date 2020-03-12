@@ -82,8 +82,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:indeterminate="true"
-        android:visibility="visible"/>
-
+        android:visibility="invisible"/>
 
     <FrameLayout
         android:layout_width="wrap_content"

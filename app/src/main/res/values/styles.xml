@@ -6,6 +6,32 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="navigationViewLocationLayerStyle">@style/NavigationLocationLayerStyle</item>
+
+    </style>
+
+    <style name="NavigationMapRoute">
+        <!-- Colors -->
+        <item name="routeColor">@color/mapboxBlue</item>
+        <item name="routeModerateCongestionColor">@color/mapboxYellow</item>
+        <item name="routeSevereCongestionColor">@color/mapboxPink</item>
+        <item name="routeShieldColor">@color/mapboxWhite</item>
+        <!-- Scales -->
+        <item name="routeScale">1.0</item>
+    </style>
+
+    <style name="NavigationView" parent="Theme.AppCompat.NoActionBar">
+        <item name="navigationViewPrimary">@color/mapboxWhite</item>
+        <item name="navigationViewSecondary">@color/mapboxBlue</item>
+        <item name="navigationViewAccent">@color/mapboxPink</item>
+    </style>
+
+    <style name="customInstructionView" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="navigationViewRouteStyle">@style/NavigationMapRoute</item>
+        <item name="navigationViewLocationLayerStyle">@style/NavigationLocationLayerStyle</item>
+        <item name="navigationViewDestinationMarker">@drawable/map_marker_light</item>
+        <item name="navigationViewRouteOverviewDrawable">@drawable/ic_route_preview</item>
+        <item name="navigationViewMapStyle">@string/mapbox_style_dark</item>
     </style>
 
 </resources>

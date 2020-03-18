@@ -24,9 +24,11 @@ mapbox-android-navigation-ui: 0.42.5
 
 ## 動作イメージ
 
-| 起動時 |開始点を(長めに)クリック|終点を（長めに)クリック|ルートの表示(左上ボタンでリセット)|
+| 起動時 |経路データ読み込み|ルート表示|ナビの開始|
 |-|-|-|-|
-|<img src="./assets/Screenshot_1583100886.png">|<img src="./assets/Screenshot_1583101168.png">|<img src="./assets/Screenshot_1583101180.png">|<img src="./assets/Screenshot_1583101200.png">|
+|<img src="./assets/Screenshot_1584555896.png">|<img src="./assets/Screenshot_1584538129.png">|<img src="./assets/Screenshot_1584538170.png">|<img src="./assets/Screenshot_1584538242.png">|
+|<img src="./assets/mapbox_nav_demo.gif">|
+
 
 - (option)　Android Studio AVDにて、事前に位置情報を指定する
 

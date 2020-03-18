@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.mynavigation.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.JsonElement;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineCallback;
 import com.mapbox.android.core.location.LocationEngineProvider;
@@ -29,7 +29,6 @@ import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.api.directions.v5.DirectionsCriteria;
 import com.mapbox.api.directions.v5.models.DirectionsResponse;
 import com.mapbox.api.directions.v5.models.DirectionsRoute;
-import com.mapbox.core.utils.TextUtils;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
 import com.mapbox.geojson.Point;
@@ -72,7 +71,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import timber.log.Timber;
 
-import static android.os.Environment.getExternalStoragePublicDirectory;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.eq;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
@@ -80,7 +79,7 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
 /*
 This code is forked and modified from Android Sample in mapbox-navigation-android
 https://github.com/mapbox/mapbox-navigation-android/blob/v0.43.0-alpha.1/app/src/main/java/com/mapbox/services/android/navigation/testapp/activity/navigationui/NavigationLauncherActivity.java#L308
-latest SDK is 1.0.0, but use 0.42.4 for some compatibility
+latest SDK is 1.0.0, but use 0.42.5 for some compatibility
 */
 
 public class NavigationMapRouteActivity extends AppCompatActivity implements OnMapReadyCallback, PermissionsListener, OnRouteSelectionChangeListener,
@@ -100,19 +99,12 @@ public class NavigationMapRouteActivity extends AppCompatActivity implements OnM
 
     @BindView(R.id.mapView)
     MapView mapView;
-    @BindView(R.id.routeLoadingProgressBar)
-    ProgressBar routeLoading;
     @BindView(R.id.fabRemoveRoute)
     FloatingActionButton fabRemoveRoute;
-
-    // for navigation launcher
-    @BindView(R.id.loading)
-    ProgressBar loading;
     @BindView(R.id.launch_route_btn)
     Button launchRouteBtn;
     @BindView(R.id.launch_btn_frame)
     FrameLayout launchBtnFrame;
-
 
     private PermissionsManager permissionsManager;
     private MapboxMap mapboxMap;
@@ -130,6 +122,7 @@ public class NavigationMapRouteActivity extends AppCompatActivity implements OnM
 
     private DirectionsRoute route;
     private final NavigationMapRouteLocationCallback callback = new NavigationMapRouteLocationCallback(this);
+    private List<JsonElement> waypoint_names = new ArrayList<>();
 
 
     @Override
@@ -280,12 +273,7 @@ public class NavigationMapRouteActivity extends AppCompatActivity implements OnM
     @Override
     public void onPermissionResult(boolean granted) {
         if (granted) {
-            mapboxMap.getStyle(new Style.OnStyleLoaded() {
-                @Override
-                public void onStyleLoaded(@NonNull Style style) {
-                    initializeLocationComponent(mapboxMap);
-                }
-            });
+            mapboxMap.getStyle(style -> initializeLocationComponent(mapboxMap));
         } else {
             Toast.makeText(this, R.string.user_location_permission_not_granted, Toast.LENGTH_LONG).show();
             finish();
@@ -302,15 +290,23 @@ public class NavigationMapRouteActivity extends AppCompatActivity implements OnM
     }
 
     public void findRoute(Point origin, Point destination) {
-        NavigationRoute.builder(this)
+
+//        NavigationRoute.builder(this)
+
+        NavigationRoute.Builder builder = NavigationRoute.builder(this)
                 .accessToken(Mapbox.getAccessToken())
                 .origin(currentLocation)
                 .profile(getRouteProfileFromSharedPreferences())    // added for getting profile()
                 .destination(destination)
-                .addWaypoint(origin)
-                .alternatives(true)
-                .build()
-                .getRoute(this);
+                .alternatives(true);
+
+        for (Point wayPoint : wayPoints) {
+            builder.addWaypoint(wayPoint);
+        }
+
+        builder.addWaypoint(origin);
+
+        builder.build().getRoute(this);
 
         launchRouteBtn.setEnabled(true);
 
@@ -398,6 +394,26 @@ public class NavigationMapRouteActivity extends AppCompatActivity implements OnM
 
                         destinationMarker = mapboxMap.addMarker(new MarkerOptions().position(finish_latLng).icon(IconFactory.getInstance(NavigationMapRouteActivity.this).fromResource(R.drawable.yellow_marker)));
 
+                        List<Feature> waypoint_features = source.querySourceFeatures(all(eq(get("start"), literal("false")),eq(get("finish"), literal("false"))));
+
+                        for (Feature waypoint_feature : waypoint_features) {
+                            Log.d(TAG, String.format("Feature name is %s", waypoint_feature.getProperty("name")));
+
+                            if (waypoint_names.contains(waypoint_feature.getProperty("name"))){
+                                Log.d(TAG, String.format("waypoint has duplicated."));
+                                continue;
+                            }
+                            waypoint_names.add(waypoint_feature.getProperty("name"));
+                            Geometry waypoint_geometry = waypoint_feature.geometry();
+                            Point waypoint_point = (Point) waypoint_geometry;
+                            wayPoints.add(Point.fromLngLat(waypoint_point.longitude(), waypoint_point.latitude()));
+                        }
+
+
+                        Log.d(TAG, String.format("waipoint array length is %s",wayPoints.size()));
+
+                        Snackbar.make(mapView, "now finding Route ...", Snackbar.LENGTH_LONG).show();
+
                         findRoute(start_point, finish_point);
 
 
@@ -441,21 +457,11 @@ public class NavigationMapRouteActivity extends AppCompatActivity implements OnM
     private String getRouteProfileFromSharedPreferences() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         return sharedPreferences.getString(
-                getString(R.string.route_profile_key), DirectionsCriteria.PROFILE_DRIVING_TRAFFIC
+//                getString(R.string.route_profile_key), DirectionsCriteria.PROFILE_DRIVING_TRAFFIC
+                getString(R.string.route_profile_key), DirectionsCriteria.PROFILE_DRIVING
         );
     }
 
-    // for launcher
-    private String obtainOfflinePath() {
-        File offline = getExternalStoragePublicDirectory("Offline");
-        return offline.getAbsolutePath();
-    }
-
-    // for launcher
-    private String retrieveOfflineVersionFromPreferences() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        return sharedPreferences.getString(getString(R.string.offline_version_key), "");
-    }
 
     // for launcher
     private void launchNavigationWithRoute() {
@@ -480,14 +486,6 @@ public class NavigationMapRouteActivity extends AppCompatActivity implements OnM
                 .build();
         optionsBuilder.initialMapCameraPosition(initialPosition);
         optionsBuilder.directionsRoute(route);
-        String offlinePath = obtainOfflinePath();
-        if (!TextUtils.isEmpty(offlinePath)) {
-            optionsBuilder.offlineRoutingTilesPath(offlinePath);
-        }
-        String offlineVersion = retrieveOfflineVersionFromPreferences();
-        if (!offlineVersion.isEmpty()) {
-            optionsBuilder.offlineRoutingTilesVersion(offlineVersion);
-        }
         // TODO Testing dynamic offline
         /**
          * File downloadDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);

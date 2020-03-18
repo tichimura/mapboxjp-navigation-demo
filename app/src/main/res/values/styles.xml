@@ -20,12 +20,6 @@
         <item name="routeScale">1.0</item>
     </style>
 
-    <style name="NavigationView" parent="Theme.AppCompat.NoActionBar">
-        <item name="navigationViewPrimary">@color/mapboxWhite</item>
-        <item name="navigationViewSecondary">@color/mapboxBlue</item>
-        <item name="navigationViewAccent">@color/mapboxPink</item>
-    </style>
-
     <style name="customInstructionView" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="navigationViewRouteStyle">@style/NavigationMapRoute</item>
         <item name="navigationViewLocationLayerStyle">@style/NavigationLocationLayerStyle</item>
